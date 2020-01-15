@@ -646,7 +646,7 @@ def seq_logo(pwm, height=30, nt_width=10, norm=0, alphabet='dna', colormap='stan
 
 				remaining_height -= nt_height[j]
 
-		return logo.astype(np.uint8)
+	return logo.astype(np.uint8)
 
 
 def seq_logo_reverse(pwm, height=30, nt_width=10, norm=0, alphabet='dna', colormap='standard'):
