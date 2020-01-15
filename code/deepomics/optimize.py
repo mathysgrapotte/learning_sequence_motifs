@@ -166,7 +166,7 @@ def build_loss(network, predictions, targets, optimization):
 
 def cost_function(network, targets, optimization):
 
-	global loss
+
 	objective = optimization['objective']
 	label_smoothing = optimization['label_smoothing']
 
