@@ -6,7 +6,8 @@ from matplotlib import cm
 import matplotlib as mpl
 from matplotlib import rcParams
 rcParams.update({'figure.autolayout': True})
-from scipy.misc import imresize
+#from scipy.misc import imresize
+from PIL import Image
 import pandas as pd
 from .utils import normalize_pwm
 from matplotlib import gridspec
@@ -619,32 +620,33 @@ def seq_logo(pwm, height=30, nt_width=10, norm=0, alphabet='dna', colormap='stan
 	else:
 		max_height = height*2
 	#total_height = np.sum(heights,axis=0) # np.minimum(np.sum(heights,axis=0), max_height)
-	logo = np.ones((max_height, width, 3)).astype(int)*255;
+	logo = np.ones((max_height, width, 3)).astype(int)*255
 	for i in range(num_seq):
-		nt_height = np.sort(heights[:,i]);
-		index = np.argsort(heights[:,i])
-		remaining_height = np.sum(heights[:,i]);
+		nt_height = np.sort(heights[:, i])
+		index = np.argsort(heights[:, i])
+		remaining_height = np.sum(heights[:, i])
 		offset = max_height-remaining_height
 
 		for j in range(num_nt):
 			if nt_height[j] > 0:
 				# resized dimensions of image
-				nt_img = imresize(chars[index[j]], (nt_height[j], nt_width))
+				# Decrepated !! nt_img = imresize(chars[index[j]], (nt_height[j], nt_width))
+				nt_img = np.array(Image.fromarray(chars[index[j]]).resize((nt_width, nt_height[j])))
 
 				# determine location of image
 				height_range = range(remaining_height-nt_height[j], remaining_height)
 				width_range = range(i*nt_width, i*nt_width+nt_width)
 
+
 				# 'annoying' way to broadcast resized nucleotide image
 				if height_range:
 					for k in range(3):
 						for m in range(len(width_range)):
-							logo[height_range+offset, width_range[m],k] = nt_img[:,m,k];
+							logo[height_range+offset, width_range[m], k] = nt_img[:, m, k]
 
 				remaining_height -= nt_height[j]
 
-	return logo.astype(np.uint8)
-
+		return logo.astype(np.uint8)
 
 
 def seq_logo_reverse(pwm, height=30, nt_width=10, norm=0, alphabet='dna', colormap='standard'):
@@ -659,16 +661,16 @@ def seq_logo_reverse(pwm, height=30, nt_width=10, norm=0, alphabet='dna', colorm
 			return s
 
 		num_nt, num_seq = pwm.shape
-		heights = np.zeros((num_nt,num_seq));
+		heights = np.zeros((num_nt, num_seq))
 		for i in range(num_seq):
 			if norm == 1:
 				total_height = height
 			else:
-				total_height = (np.log2(num_nt) - entropy(pwm[:, i]))*height;
+				total_height = (np.log2(num_nt) - entropy(pwm[:, i]))*height
 			if alphabet == 'pu':
-				heights[:,i] = np.floor(pwm[:,i]*np.minimum(total_height, height));
+				heights[:, i] = np.floor(pwm[:, i]*np.minimum(total_height, height))
 			else:
-				heights[:,i] = np.floor(pwm[:,i]*np.minimum(total_height, height*2));
+				heights[:, i] = np.floor(pwm[:, i]*np.minimum(total_height, height*2))
 
 		return heights.astype(int)
 
@@ -699,7 +701,8 @@ def seq_logo_reverse(pwm, height=30, nt_width=10, norm=0, alphabet='dna', colorm
 		for j in range(num_nt):
 			if nt_height[j] > 0:
 				# resized dimensions of image
-				nt_img = imresize(chars[index[j]], (nt_height[j], nt_width))
+				# Decrepated !! nt_img = imresize(chars[index[j]], (nt_height[j], nt_width))
+				nt_img = np.array(Image.fromarray(chars[index[j]].resize((nt_width, nt_height[j]))))
 
 				# determine location of image
 				height_range = range(remaining_height, remaining_height+nt_height[j])
